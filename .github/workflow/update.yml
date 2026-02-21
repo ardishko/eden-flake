@@ -1,0 +1,74 @@
+name: Update packages
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - eden
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Update and build
+        id: update
+        run: |
+          nix run nixpkgs#nix-update -- \
+            --flake \
+            --build \
+            ${{ matrix.package }}
+        continue-on-error: true
+
+      - name: Check if anything changed
+        id: changed
+        run: |
+          git diff --quiet && echo "changed=false" >> $GITHUB_OUTPUT \
+            || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Get new version
+        id: version
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          VERSION=$(nix eval --raw .#packages.x86_64-linux.${{ matrix.package }}.version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create PR
+        if: steps.changed.outputs.changed == 'true' && steps.update.outcome == 'success'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "${{ matrix.package }}: update to ${{ steps.version.outputs.version }}"
+          title: "${{ matrix.package }}: update to ${{ steps.version.outputs.version }}"
+          body: "Automated update. Build passed."
+          branch: "auto-update/${{ matrix.package }}"
+          delete-branch: true
+          labels: auto-update
+
+  automerge:
+    runs-on: ubuntu-latest
+    needs: update
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Auto-merge passing update PRs
+        uses: pascalgn/automerge-action@v0.16.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_LABELS: "auto-update"
+          MERGE_METHOD: squash
+          MERGE_COMMIT_MESSAGE: pull-request-title
+          MERGE_DELETE_BRANCH: "true"
