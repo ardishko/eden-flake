@@ -1,77 +1,45 @@
 {
-  lib,
-  steam-run,
-  bash,
   fetchurl,
   stdenv,
-  makeWrapper,
+  lib,
 }:
-stdenv.mkDerivation rec {
-  pname = "eden";
-  version = "v0.2.0-rc1";
+stdenv.mkDerivation (finalAttrs: {
+  pname = "eden-bin";
+  version = "0.2.0-rc1";
+
   src = fetchurl {
-    url = "https://github.com/eden-emulator/Releases/releases/download/${version}/Eden-Linux-${version}-aarch64-clang-pgo.AppImage";
-    hash = "sha256-oi6C4uHUmu1OPL3+aFl89wIwQvQ+wI/LttMcF+IRiG8=";
+    url = "https://github.com/eden-emulator/Releases/releases/download/v${finalAttrs.version}/Eden-Linux-v${finalAttrs.version}-amd64-clang-pgo.AppImage";
+    sha256 = "sha256-WB+UcqaW/Gf2STA8E8vCwi6EScPrdSIrje0V5xPW65Q=";
   };
 
-  icon = ./org.eden_emu.eden.svg;
+  desktopItem = fetchurl {
+    url = "https://git.eden-emu.dev/eden-emu/eden/raw/tag/v${finalAttrs.version}/dist/dev.eden_emu.eden.desktop";
+    sha256 = "sha256-GfVkDT1vrgmgqCcI4vjI6cqPA6JkVUu8BNZRh5Yvq+U=";
+  };
 
-  dontUnpack = true;
+  desktopIcon = fetchurl {
+    url = "https://git.eden-emu.dev/eden-emu/eden/raw/tag/v${finalAttrs.version}/dist/dev.eden_emu.eden.svg";
+    sha256 = "sha256-tiGRacrAUXPpbIF0eW3Jku1EvGjNLY4FOd4KrCy5XWk=";
+  };
 
-  nativeBuildInputs = [ makeWrapper ];
+  phases = [ "installPhase" ];
 
   installPhase = ''
     mkdir -p $out/bin
-    mkdir -p $out/share/applications
-    mkdir -p $out/share/icons/hicolor/scalable/apps
-    mkdir -p $out/opt/${pname}
+    cp $src $out/bin/eden
+    chmod +x $out/bin/eden
 
-    # Copy AppImage to $out/opt
-    cp $src $out/opt/${pname}/${pname}.AppImage
-    chmod +x $out/opt/${pname}/${pname}.AppImage
-
-    # Copy icon to $out/share/icons
-    cp ${icon} $out/share/icons/hicolor/scalable/apps/org.eden_emu.eden.svg
-
-    # Wrap with steam-run
-    wrapProgram $out/opt/${pname}/${pname}.AppImage \
-      --prefix PATH : ${steam-run}/bin \
-      --argv0 $out/bin/${pname}
-
-    # Simpler: create wrapper script manually
-    cat > $out/bin/${pname} <<EOF
-    #!${bash}/bin/bash
-    ${steam-run}/bin/steam-run $out/opt/${pname}/${pname}.AppImage
-    EOF
-    chmod +x $out/bin/${pname}
-
-    # Desktop entry
-    cat > $out/share/applications/${pname}.desktop <<EOF
-    [Desktop Entry]
-    Type=Application
-    Name=Eden
-    GenericName=Switch Emulator
-    Comment=Nintendo Switch video game console emulator
-    Exec=${pname}
-    Icon=org.eden_emu.eden
-    Categories=Game;Emulator;Qt;
-    MimeType=application/x-nx-nro;application/x-nx-nso;application/x-nx-nsp;application/x-nx-xci;
-    Keywords=Nintendo;Switch;
-    StartupWMClass=eden
-    EOF
+    mkdir -p $out/share/{applications,icons/hicolor/scalable/apps}
+    cp ${finalAttrs.desktopItem} $out/share/applications/dev.eden_emu.eden.desktop
+    cp ${finalAttrs.desktopIcon} $out/share/icons/hicolor/scalable/apps/dev.eden_emu.eden.svg
   '';
 
-  meta = with lib; {
-    description = "Nintendo Switch emulator (Eden fork)";
-    longDescription = ''
-      Eden is an experimental open-source emulator for the Nintendo Switch,
-      built with performance and stability in mind. It is a fork of yuzu
-      that aims to continue development.
-    '';
+  meta = {
+    description = "Eden Nintendo Switch Emulator";
     homepage = "https://eden-emu.dev/";
-    license = licenses.gpl3Plus;
-    maintainers = [ ]; # Add your name here if you want
-    platforms = platforms.linux;
+    license = lib.licenses.gpl3;
+    maintainers = [ ];
+    platforms = lib.platforms.linux;
     mainProgram = "eden";
   };
-}
+})
