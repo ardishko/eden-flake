@@ -32,8 +32,21 @@ stdenv.mkDerivation (finalAttrs: {
     cp $src $out/bin/eden
     chmod +x $out/bin/eden
 
-    cp $desktopItem $out/share/applications/dev.eden_emu.eden.desktop
     cp $desktopIcon $out/share/icons/hicolor/scalable/apps/dev.eden_emu.eden.svg
+
+    cat > $out/share/applications/eden.desktop << EOF
+    [Desktop Entry]
+    Type=Application
+    Name=Eden
+    GenericName=Switch Emulator
+    Comment=Nintendo Switch video game console emulator
+    Exec=$out/bin/eden
+    Icon=dev.eden_emu.eden
+    Categories=Game;Emulator;Qt;
+    MimeType=application/x-nx-nro;application/x-nx-nso;application/x-nx-nsp;application/x-nx-xci;
+    Keywords=Nintendo;Switch;
+    StartupWMClass=eden
+    EOF
   '';
 
   meta = {
