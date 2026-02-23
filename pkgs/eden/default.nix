@@ -8,10 +8,10 @@
 }:
 stdenv.mkDerivation rec {
   pname = "eden";
-  version = "v0.0.3-rc3";
+  version = "v0.2.0-rc1";
   src = fetchurl {
-    url = "https://github.com/eden-emulator/Releases/releases/download/${version}/Eden-Linux-${version}-amd64.AppImage";
-    hash = "sha256-ipgIJVwu/EVGanSZZRubkN7nhmTamMYtMxYxixckftc=";
+    url = "https://github.com/eden-emulator/Releases/releases/download/Eden-Linux-${version}-aarch64-clang-pgo.AppImage";
+    hash = lib.fakeHash;
   };
 
   icon = ./org.eden_emu.eden.svg;
