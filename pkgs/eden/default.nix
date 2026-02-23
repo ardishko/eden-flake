@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   version = "v0.2.0-rc1";
   src = fetchurl {
     url = "https://github.com/eden-emulator/Releases/releases/download/${version}/Eden-Linux-${version}-aarch64-clang-pgo.AppImage";
-    hash = lib.fakeHash;
+    hash = "sha256-oi6C4uHUmu1OPL3+aFl89wIwQvQ+wI/LttMcF+IRiG8=";
   };
 
   icon = ./org.eden_emu.eden.svg;
