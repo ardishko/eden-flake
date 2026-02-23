@@ -10,7 +10,7 @@ stdenv.mkDerivation rec {
   pname = "eden";
   version = "v0.2.0-rc1";
   src = fetchurl {
-    url = "https://github.com/eden-emulator/Releases/releases/download/Eden-Linux-${version}-aarch64-clang-pgo.AppImage";
+    url = "https://github.com/eden-emulator/Releases/releases/download/${version}/Eden-Linux-${version}-aarch64-clang-pgo.AppImage";
     hash = lib.fakeHash;
   };
 
