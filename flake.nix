@@ -4,7 +4,7 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs =
-    { nixpkgs }:
+    { nixpkgs, ... }:
     let
       systems = [
         "x86_64-linux"
