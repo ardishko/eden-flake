@@ -31,3 +31,7 @@ environment.systemPackages = [ inputs.eden-flake.packages.${pkgs.system}.eden ];
 The auto-updater is currently WIP, however below is how it's supposed to work:
 
 The package is automatically updated daily via GitHub Actions. When a new Eden release is detected with a Linux AppImage, the package link is updated and a PR is opened. If the build passes, the PR is merged automatically.
+
+## Why isn't this in nixpkgs?
+
+I still haven't been able to run eden without steam-run and I don't think nixpkgs would appreciate calling steam-run in a package like this, so the package remains a flake.
