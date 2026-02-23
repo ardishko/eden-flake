@@ -4,7 +4,7 @@
   lib,
 }:
 stdenv.mkDerivation (finalAttrs: {
-  pname = "eden-bin";
+  pname = "eden";
   version = "0.2.0-rc1";
 
   src = fetchurl {
@@ -26,12 +26,14 @@ stdenv.mkDerivation (finalAttrs: {
 
   installPhase = ''
     mkdir -p $out/bin
+    mkdir -p $out/share/applications
+    mkdir -p $out/share/icons/hicolor/scalable/apps
+
     cp $src $out/bin/eden
     chmod +x $out/bin/eden
 
-    mkdir -p $out/share/{applications,icons/hicolor/scalable/apps}
-    cp ${finalAttrs.desktopItem} $out/share/applications/dev.eden_emu.eden.desktop
-    cp ${finalAttrs.desktopIcon} $out/share/icons/hicolor/scalable/apps/dev.eden_emu.eden.svg
+    cp $desktopItem $out/share/applications/dev.eden_emu.eden.desktop
+    cp $desktopIcon $out/share/icons/hicolor/scalable/apps/dev.eden_emu.eden.svg
   '';
 
   meta = {
