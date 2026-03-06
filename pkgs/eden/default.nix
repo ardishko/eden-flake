@@ -8,7 +8,7 @@ stdenv.mkDerivation (finalAttrs: {
   version = "0.2.0-rc1";
 
   src = fetchurl {
-    url = "https://github.com/eden-emulator/Releases/releases/download/v${finalAttrs.version}/Eden-Linux-v${finalAttrs.version}-amd64-clang-pgo.AppImage";
+    url = "https://git.eden-emu.dev/eden-emu/eden/releases/download/v${finalAttrs.version}/Eden-Linux-v${finalAttrs.version}-amd64-clang-pgo.AppImage";
     sha256 = "sha256-WB+UcqaW/Gf2STA8E8vCwi6EScPrdSIrje0V5xPW65Q=";
   };
 
