@@ -20,11 +20,10 @@ jobs:
       - name: Get latest release
         id: release
         run: |
-          RELEASE=$(curl -s https://api.github.com/repos/eden-emulator/Releases/releases/latest)
-          VERSION=$(echo "$RELEASE" | jq -r '.tag_name' | sed 's/^v//')
-          URL=$(echo "$RELEASE" | jq -r '.assets[].browser_download_url' \
-            | grep -i 'linux.*amd64.*\.AppImage$' \
-            | grep -iv 'zsync\|clang\|pgo' \
+          RELEASE=$(curl -s "https://git.eden-emu.dev/api/v1/repos/eden-emu/eden/releases?limit=1")
+          VERSION=$(echo "$RELEASE" | jq -r '.[0].tag_name' | sed 's/^v//')
+          URL=$(echo "$RELEASE" | jq -r '.[0].assets[].browser_download_url' \
+            | grep -i 'Eden-Linux-v.*-amd64-gcc-standard\.AppImage$' \
             | head -1)
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
