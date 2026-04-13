@@ -23,6 +23,7 @@
         in
         {
           eden = pkgs.callPackage ./pkgs/eden { };
+          default = pkgs.callPackage ./pkgs/eden { };
         }
       );
     };
